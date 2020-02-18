@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">RedBusMap</string>
+    <string name="error_string">Some error occurred</string>
+    <string name="source_hint">Source</string>
+    <string name="save_title">Save</string>
+    <string name="previous_title">Previous</string>
+    <string name="data_save_message">Data Saved.</string>
+</resources>
