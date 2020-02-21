@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimary1">#4285F4</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="grey_color">#CFD8DC</color>
+    <color name="polyline_color">#0091EA</color>
+    <color name="disabled_polyline_color">#B0BEC5</color>
+    <color name="button_0091EA">#0091EA</color>
+    <color name="button_E65100">#E65100</color>
+
+
+</resources>

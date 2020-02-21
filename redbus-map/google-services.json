@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:830923291924:android:8791ba940fc631c622d601",
         "android_client_info": {
-          "package_name": "com.redbus.map.sample"
+          "package_name": "com.redbus.map"
         }
       },
       "oauth_client": [

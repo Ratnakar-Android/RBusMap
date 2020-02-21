@@ -1,6 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-</LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools">
+
+            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:map="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                map:mapType="normal"
+                tools:context=".MapStartedActivity"/>
+            <ImageView
+                android:layout_height="@dimen/edittext_height_50dp"
+                android:layout_width="@dimen/edittext_height_50dp"
+                android:layout_centerInParent="true"
+                android:id="@+id/imgLocationPinUp"
+                android:src="@drawable/location_pick_marker"
+                />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/root"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal">
+
+
+
+            <RelativeLayout
+                android:id="@+id/bottom_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/quantum_white_100"
+               >
+                <ImageView
+                    android:id="@+id/save_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/dimen_40dp"
+                    android:layout_marginRight="@dimen/dimen_10dp"
+                    android:layout_marginTop="@dimen/dimen_10dp"
+                    android:layout_marginBottom="@dimen/dimen_10dp"
+                    android:background="@drawable/ic_live_user"
+                    android:textColor="@android:color/white"
+
+                    />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_toRightOf="@+id/save_btn"
+                    android:layout_centerInParent="true"
+                    android:background="#D5D8DC"
+                    android:layout_marginRight="@dimen/dimen_10dp"
+                    android:layout_toLeftOf="@+id/previous_btn"
+                    android:layout_height="2dp"></View>
+
+                <ImageView
+                    android:id="@+id/previous_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="@dimen/dimen_10dp"
+                    android:layout_marginRight="40dp"
+                    android:background="@drawable/ic_live_user"
+                    android:text="@string/previous_title"
+                    android:textColor="@android:color/white"
+                    />
+
+
+
+
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_below="@+id/bottom_layout"
+                android:text="@string/previous_title"
+
+                android:background="#239B56"
+                android:layout_height="@dimen/edittext_height_50dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="slide to START RIDE"
+                    android:textColor="@android:color/white"
+                    />
+
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+
+
+
+    </RelativeLayout>
+
