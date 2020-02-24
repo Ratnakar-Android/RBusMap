@@ -1,6 +1,7 @@
 package com.redbus.map.sample;
 
 import android.Manifest;
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -12,8 +13,10 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.ResultReceiver;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -43,15 +46,22 @@ import in.redbus.android.rblogger.client.RedBusMapRepository;
 
 import static androidx.core.app.NotificationCompat.PRIORITY_MIN;
 
-public class RBBackgroundService extends Service implements OSRMRouteListener {
-    private static final int NOTIF_ID = 101;
-    private static final String NOTIF_CHANNEL_ID = "Channel_Id";
+public class RBBackgroundService extends IntentService implements OSRMRouteListener {
 
+    private static final int NOTIF_ID = 101;
     private Location mUserCurrentLocation;
     FusedLocationProviderClient mFusedLocation;
     // we are requesting fuse to check Location after 10 seconds
-    private static final int INTERVAL = 20000;
-    private static final int FASTEST_INTERVAL = 20000;
+    private static final int INTERVAL = 10000;
+    private static final int FASTEST_INTERVAL = 40000;
+    String distance;
+    String duration;
+    ResultReceiver myResultReceiver;
+    private static String TAG = RBBackgroundService.class.getSimpleName();
+
+    public RBBackgroundService() {
+        super(TAG);
+    }
 
     @Nullable
     @Override
@@ -60,12 +70,17 @@ public class RBBackgroundService extends Service implements OSRMRouteListener {
     }
 
     @Override
+    protected void onHandleIntent(@Nullable Intent intent) {
+        if(intent!=null){
+            myResultReceiver =  intent.getParcelableExtra("result");
+        }
+
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId){
-
         startLocationUpdates();
-
         startForeground();
-
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -144,8 +159,23 @@ public class RBBackgroundService extends Service implements OSRMRouteListener {
 
     @Override
     public void onResult(JsonObject result) {
-        String  encodedGeometry  = result.getAsJsonArray("routes").get(0).getAsJsonObject().get("geometry").getAsString();
-        getPolyLine(encodedGeometry);
+        if (result != null && result.size() > 0 && result.getAsJsonArray("routes") != null
+                && result.getAsJsonArray("routes").get(0) != null &&
+                result.getAsJsonArray("routes").get(0).getAsJsonObject() != null && result.getAsJsonArray("routes").get(0).getAsJsonObject().get("geometry") != null &&
+                result.getAsJsonArray("routes").get(0).getAsJsonObject().get("geometry").getAsString() != null){
+
+            String  encodedGeometry  = result.getAsJsonArray("routes").get(0).getAsJsonObject().get("geometry").getAsString();
+
+             distance = result.getAsJsonArray("routes").get(0).getAsJsonObject().get("distance").getAsString();
+             duration = result.getAsJsonArray("routes").get(0).getAsJsonObject().get("duration").getAsString();
+             Bundle bundle = new Bundle();
+             bundle.putString("distance",distance);
+             bundle.putString("duration",duration);
+             myResultReceiver.send(100,bundle);
+             getPolyLine(encodedGeometry);
+        }
+
+
     }
 
     @Override
@@ -179,11 +209,6 @@ public class RBBackgroundService extends Service implements OSRMRouteListener {
 
             RedBusMapRepository.getInstance(RBBackgroundService.this).callOsrmRouteApi(RBBackgroundService.this
                     , RBBackgroundService.this, location);
-
         }
     }
-
-
-
-
 }

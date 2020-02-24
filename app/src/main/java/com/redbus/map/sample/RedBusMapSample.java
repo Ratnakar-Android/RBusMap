@@ -6,7 +6,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,26 +25,46 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 
 import com.google.android.gms.maps.SupportMapFragment;
 import com.redbus.map.module.RMapProvider;
+import com.redbus.map.sample.listener.MyResultReceiver;
+import com.redbus.map.sample.listener.etaUpdateReceiver;
 
-public class RedBusMapSample extends AppCompatActivity  {
+public class RedBusMapSample extends AppCompatActivity implements MyResultReceiver.GetResultInterface{
 
     public static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9003;
     private boolean mLocationPermissionGranted  = false;
     FrameLayout mContainerID;
+    TextView distance;
+    TextView eta;
+    MyResultReceiver myResultReceiver;
+    RelativeLayout distanceLayout;
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sample_layout);
+        distanceLayout = (RelativeLayout) findViewById(R.id.distance_layout);
+        distance = (TextView) findViewById(R.id.distance);
+        eta = (TextView) findViewById(R.id.eta);
+
+        myResultReceiver = new MyResultReceiver(new Handler());
+        myResultReceiver.setReceiver(this);
 
        // mContainerID = (FrameLayout)findViewById(R.id.map_fragment_container) ;
         FragmentManager myFragmentManager = this.getSupportFragmentManager();
         SupportMapFragment mapFragment = (SupportMapFragment) myFragmentManager
                 .findFragmentById(R.id.map);
+
         RMapProvider.getInstance(this).addMapToView(mapFragment);
 
-        startService(new Intent(this, RBBackgroundService.class));
+       // startService(new Intent(this, RBBackgroundService.class));
+
+        Intent intent = new Intent(this, RBBackgroundService.class);
+        intent.putExtra("result",myResultReceiver);
+        startService(intent);
+
+        myResultReceiver = new MyResultReceiver(new Handler());
+        myResultReceiver.setReceiver(this);
     }
 
     @Override
@@ -79,6 +104,22 @@ public class RedBusMapSample extends AppCompatActivity  {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mLocationPermissionGranted = true;
                 }
+            }
+        }
+    }
+
+
+    @Override
+    public void getResult(int resultCode, Bundle resultData) {
+        if(resultData!=null){
+            switch (resultCode){
+                case 100:
+                    distanceLayout.setVisibility(View.VISIBLE);
+                    double  totalDistance = Double.valueOf(resultData.getString("distance")) / 1000;
+                    double  totalDuration = Double.valueOf(resultData.getString("duration")) / 60;
+                    distance.setText(String.valueOf(Math.round(totalDistance * 10) / 10.0 + " Km"));
+                    eta.setText(String.valueOf(Math.round(totalDuration * 10) / 10.0 +" Minute"));
+                    break;
             }
         }
     }

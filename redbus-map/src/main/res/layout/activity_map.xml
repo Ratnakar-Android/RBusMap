@@ -7,19 +7,97 @@
     android:orientation="vertical"
     >
 
-    <fragment
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/map"
-        tools:context=".ui.MapsActivity"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        />
 
-    <ImageView
-        android:id="@+id/img_marker"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:layout_centerInParent="true"
-        map:srcCompat="@drawable/location_pick_marker"
-        />
+
+<!--    <fragment-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:id="@+id/map"-->
+<!--        tools:context=".ui.MapsActivity"-->
+<!--        android:name="com.google.android.gms.maps.SupportMapFragment"-->
+<!--        />-->
+
+
+
+
+
+    <RelativeLayout
+        android:id="@+id/header1"
+        android:layout_width="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:background="#80000000">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="@dimen/dimen_10dp"
+                    android:text="Distance :"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"
+                    />
+
+                <TextView
+                    android:id="@+id/diatance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="@dimen/dimen_10dp"
+                    android:layout_marginRight="40dp"
+                    android:textStyle="bold"
+                    android:text="10 Km"
+                    android:textColor="@android:color/white"
+                    />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="@dimen/dimen_10dp"
+                    android:text="ETA :"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"
+                    />
+
+                <TextView
+                    android:id="@+id/eta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="@dimen/dimen_10dp"
+                    android:layout_marginRight="40dp"
+                    android:text="20 Minute"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"
+                    />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+
+
+    </RelativeLayout>
 </RelativeLayout>

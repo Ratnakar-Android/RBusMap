@@ -28,6 +28,7 @@ class RedBusMapRepository(var mContext: Context?)  {
     }
      fun callOsrmRouteApi(listener: OSRMRouteListener, handleErrorCode: OSRMRouteListener, lastLocation: Location) {
          this.mLastLocation  = lastLocation
+
          var app = mContext!!.applicationContext as UserClient
 
          Log.v("Ratnakar api call", "callRedBusLoggerApi");
@@ -36,7 +37,12 @@ class RedBusMapRepository(var mContext: Context?)  {
 
 
          var source : String  = mLastLocation!!.longitude.toString()+","+mLastLocation!!.latitude.toString()
-         var destination = "77.697376,12.986923"
+
+         Log.v("Source", "source is "+ mLastLocation!!.longitude.toString() +" "+mLastLocation!!.latitude);
+
+
+         var destination = "77.680981,12.954519"
+
          url += source
          url += ";"
          url += destination

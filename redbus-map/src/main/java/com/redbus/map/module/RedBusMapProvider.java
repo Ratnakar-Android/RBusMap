@@ -84,7 +84,6 @@ public class RedBusMapProvider<onRequestPermissionsResult> implements MapProvide
         return singleton;
     }
 
-
     // Call from client to draw marker
     public void setUserLocationMarker(Location mUserCurrentLocation) {
         PlaceData placeData = placesDao.getPlaceData(mUserCurrentLocation);
@@ -150,12 +149,8 @@ public class RedBusMapProvider<onRequestPermissionsResult> implements MapProvide
         Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
         currentPosition = location;
 
-//        Circle circle = mGoogleMap.addCircle(new CircleOptions()
-//                .center(new LatLng(location.getLatitude(), location.getLongitude()))
-//                .radius(50)
-//                .strokeColor(Color.WHITE)
-//                .fillColor(Color.Bl));
-
+        // set Circle around the marker
+        //setCircularViewBehindMarker(location);
 
         if (location != null) {
             mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 17));
@@ -170,6 +165,14 @@ public class RedBusMapProvider<onRequestPermissionsResult> implements MapProvide
         }
     }
 
+    private void setCircularViewBehindMarker(Location location) {
+        Circle circle = mGoogleMap.addCircle(new CircleOptions()
+                .center(new LatLng(location.getLatitude(), location.getLongitude()))
+                .radius(50)
+                .strokeColor(Color.WHITE)
+                .fillColor(Color.BLUE));
+    }
+
 
     private void setSourceItem(PlaceData source) {
         this.mSource = source;
@@ -177,7 +180,6 @@ public class RedBusMapProvider<onRequestPermissionsResult> implements MapProvide
 
 
     private void setupSourceMarker(PlaceData place) {
-
         mSourceMarker = MarkerPolyLineUtil.getInstance(mContext).addMarkerToMap(mGoogleMap, place);
     }
 

@@ -17,14 +17,16 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
 import com.redbus.map.R
 import com.redbus.map.batterystatus.DragLocationListener
 import com.redbus.map.batterystatus.RBusBatteryManager
 import com.redbus.map.custompolyline.RBCustomPolyline
+import com.google.android.gms.maps.model.Polyline
+
+
+
+
 
 class RMapProvider (var context: Context ) :  OnMapReadyCallback, GoogleMap.OnCameraMoveStartedListener,
 GoogleMap.OnCameraMoveListener,
@@ -36,6 +38,7 @@ GoogleMap.OnCameraIdleListener {
     var PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION=101;
     private val TAG = "RedBusMapProvider"
     private var listener : DragLocationListener? = null
+    val polylines = ArrayList<Polyline>()
 
 
     companion object {
@@ -62,12 +65,15 @@ GoogleMap.OnCameraIdleListener {
     }
 
     private fun drawRoutingLineOnMap(PolylinePoints: List<LatLng>) {
-        val polyline = mMap.addPolyline(RBCustomPolyline.getInstance().getDotPolyline(context).addAll(PolylinePoints))
-        polyline.setWidth(context.getResources().getDimension(R.dimen.selected_polyline_width))
+            var  polyline = mMap.addPolyline(RBCustomPolyline.getInstance().getDotPolyline(context).addAll(PolylinePoints))
+            polyline.setWidth(context.getResources().getDimension(R.dimen.selected_polyline_width))
+            polylines.add(polyline)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+
+        RMapCustomMarkerProvider.getInstance(context).createMarker(mMap);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
@@ -99,7 +105,9 @@ GoogleMap.OnCameraIdleListener {
         mMap.setOnCameraIdleListener (this)
         mMap.setMaxZoomPreference(16f)
         mMap.setOnCameraMoveListener  (this)
+
         fetchCurrentLocation()
+
     }
 
     fun fetchCurrentLocation() {
@@ -132,11 +140,12 @@ GoogleMap.OnCameraIdleListener {
     override fun onCameraIdle() {
         val markerOptions = MarkerOptions().position(mMap.cameraPosition.target)
         if (listener != null){
-            mMap.clear()
+            for (line in polylines) {
+                line.remove()
+            }
             listener!!.dragLocationUpdate(markerOptions)
         }
     }
-
 
     fun addMapToView(mapFragment: SupportMapFragment) {
 
@@ -196,9 +205,5 @@ GoogleMap.OnCameraIdleListener {
         MapsInitializer.initialize(context)
         mapFragment.getMapAsync(this)
 
-
     }
-
-
-
 }

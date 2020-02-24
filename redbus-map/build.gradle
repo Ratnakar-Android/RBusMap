@@ -61,4 +61,5 @@ dependencies {
     implementation 'androidx.work:work-runtime:2.2.0'
     implementation "com.squareup.retrofit2:adapter-rxjava2:2.4.0"
     implementation 'com.google.maps.android:android-maps-utils:0.4+'
+    implementation 'de.hdodenhof:circleimageview:2.1.0'
 }
