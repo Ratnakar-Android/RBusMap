@@ -39,8 +39,11 @@ import com.redbus.map.module.RMapProvider;
 import com.redbus.map.batterystatus.DragLocationListener;
 import com.redbus.map.sample.listener.OSRMRouteListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import in.redbus.android.rblogger.client.RedBusMapRepository;
 
@@ -52,8 +55,8 @@ public class RBBackgroundService extends IntentService implements OSRMRouteListe
     private Location mUserCurrentLocation;
     FusedLocationProviderClient mFusedLocation;
     // we are requesting fuse to check Location after 10 seconds
-    private static final int INTERVAL = 10000;
-    private static final int FASTEST_INTERVAL = 40000;
+    private static final int INTERVAL = 1000000;
+    private static final int FASTEST_INTERVAL = 1000000;
     String distance;
     String duration;
     ResultReceiver myResultReceiver;
@@ -122,6 +125,10 @@ public class RBBackgroundService extends IntentService implements OSRMRouteListe
 
 
     private void startLocationUpdates() {
+
+        String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
+        Log.v("Location update:", "UpdateLocation after 10 seconds  "+currentTime);
+
         LocationRequest mLocationRequest = new LocationRequest();
         // Create the location request to start receiving updates
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);

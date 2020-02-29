@@ -1,22 +1,45 @@
 package com.redbus.map.custompolyline;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Color;
+import android.location.Location;
+import android.os.Handler;
+import android.view.animation.LinearInterpolator;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Dash;
 import com.google.android.gms.maps.model.Dot;
 import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.JointType;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
+import com.google.android.gms.maps.model.SquareCap;
 import com.redbus.map.R;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.google.android.gms.maps.model.JointType.ROUND;
 
 public class RBCustomPolyline {
 
@@ -48,6 +71,17 @@ public class RBCustomPolyline {
 
     private static final int POLYGON_STROKE_WIDTH_PX = 8;
 
+
+    Marker marker;
+    float v;
+    double lat, lng;
+    Handler handler;
+    LatLng startPosition, endPosition;
+    int index, next;
+    LatLng sydney;
+    String destination;
+    PolylineOptions polylineOptions, blackPolylineOptions;
+    Polyline blackPolyline, greyPolyLine;
 
 
     // Create a stroke pattern of a gap followed by a dash.
@@ -113,14 +147,40 @@ public class RBCustomPolyline {
         polyline.setJointType(JointType.ROUND);
     }
 
-    PolylineOptions polyOptions;
 
-    public PolylineOptions getDotPolyline(Context context){
 
-        polyOptions  = new PolylineOptions();
-        polyOptions.color(ContextCompat.getColor(context, R.color.colorPrimary1));
-        polyOptions.pattern(PATTERN_POLYGON_ALPHA);
-        return polyOptions;
+    public ArrayList<PolylineOptions> getDotPolyline(Context context, List<LatLng> polylinePoints, GoogleMap map){
+       // Adjsuting the bounds
+
+         LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (LatLng latlong: polylinePoints) {
+            builder.include(latlong);
+        }
+
+        LatLngBounds bounds = builder.build();
+        CameraUpdate mCameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 2);
+        map.animateCamera(mCameraUpdate);
+
+        PolylineOptions  greyPolyOptions  = new PolylineOptions();
+        greyPolyOptions.color(ContextCompat.getColor(context, R.color.colorPrimary1));
+        greyPolyOptions.pattern(PATTERN_POLYGON_ALPHA);
+        greyPolyOptions.startCap(new SquareCap());
+        greyPolyOptions.endCap(new SquareCap());
+        greyPolyOptions.jointType(JointType.ROUND);
+
+        PolylineOptions blackPolyOptions  = new PolylineOptions();
+        blackPolyOptions.color(ContextCompat.getColor(context, R.color.colorPrimary1));
+        blackPolyOptions.pattern(PATTERN_POLYGON_ALPHA);
+        blackPolyOptions.startCap(new SquareCap());
+        blackPolyOptions.endCap(new SquareCap());
+        blackPolyOptions.jointType(JointType.ROUND);
+
+        ArrayList<PolylineOptions> options = new ArrayList<>();
+        options.add(greyPolyOptions);
+        options.add(blackPolyOptions);
+
+
+        return options;
 
     }
 
@@ -138,6 +198,133 @@ public class RBCustomPolyline {
     }
 
 
+    public void drawPolyLineAndAnimateCar(Location myCurrent, @NotNull Context context, @NotNull List<LatLng> polyLineList, @NotNull GoogleMap mMap) {
 
 
+        //Adjusting bounds
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (LatLng latLng : polyLineList) {
+            builder.include(latLng);
+        }
+        LatLngBounds bounds = builder.build();
+        CameraUpdate mCameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 2);
+        mMap.animateCamera(mCameraUpdate);
+
+        polylineOptions = new PolylineOptions();
+        polylineOptions.color(Color.GRAY);
+        polylineOptions.width(8);
+        polylineOptions.startCap(new SquareCap());
+        polylineOptions.endCap(new SquareCap());
+        polylineOptions.jointType(ROUND);
+        polylineOptions.addAll(polyLineList);
+        greyPolyLine = mMap.addPolyline(polylineOptions);
+
+        blackPolylineOptions = new PolylineOptions();
+        blackPolylineOptions.width(8);
+        blackPolylineOptions.color(Color.BLACK);
+        blackPolylineOptions.startCap(new SquareCap());
+        blackPolylineOptions.endCap(new SquareCap());
+        blackPolylineOptions.jointType(ROUND);
+        blackPolyline = mMap.addPolyline(blackPolylineOptions);
+
+        mMap.addMarker(new MarkerOptions()
+                .position(polyLineList.get(polyLineList.size() - 1)));
+
+        ValueAnimator polylineAnimator = ValueAnimator.ofInt(0, 100);
+        polylineAnimator.setDuration(2000);
+        polylineAnimator.setInterpolator(new LinearInterpolator());
+        polylineAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                List<LatLng> points = greyPolyLine.getPoints();
+                int percentValue = (int) valueAnimator.getAnimatedValue();
+                int size = points.size();
+                int newPoints = (int) (size * (percentValue / 100.0f));
+                List<LatLng> p = points.subList(0, newPoints);
+                blackPolyline.setPoints(p);
+            }
+        });
+        polylineAnimator.start();
+        LatLng myLatlng = new LatLng(myCurrent.getLatitude(),myCurrent.getLongitude());
+        marker = mMap.addMarker(new MarkerOptions().position(myLatlng)
+                .flat(true)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_car)));
+        handler = new Handler();
+        index = -1;
+        next = 1;
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (index < polyLineList.size() - 1) {
+                    index++;
+                    next = index + 1;
+                }
+                if (index < polyLineList.size() - 1) {
+                    startPosition = polyLineList.get(index);
+                    endPosition = polyLineList.get(next);
+                }
+//                if (index == 0) {
+//                    BeginJourneyEvent beginJourneyEvent = new BeginJourneyEvent();
+//                    beginJourneyEvent.setBeginLatLng(startPosition);
+//                    JourneyEventBus.getInstance().setOnJourneyBegin(beginJourneyEvent);
+//                }
+//                if (index == polyLineList.size() - 1) {
+//                    EndJourneyEvent endJourneyEvent = new EndJourneyEvent();
+//                    endJourneyEvent.setEndJourneyLatLng(new LatLng(polyLineList.get(index).latitude,
+//                            polyLineList.get(index).longitude));
+//                    JourneyEventBus.getInstance().setOnJourneyEnd(endJourneyEvent);
+//                }
+                ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1);
+                valueAnimator.setDuration(3000);
+                valueAnimator.setInterpolator(new LinearInterpolator());
+                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                        v = valueAnimator.getAnimatedFraction();
+                        lng = v * endPosition.longitude + (1 - v)
+                                * startPosition.longitude;
+                        lat = v * endPosition.latitude + (1 - v)
+                                * startPosition.latitude;
+                        LatLng newPos = new LatLng(lat, lng);
+//                        CurrentJourneyEvent currentJourneyEvent = new CurrentJourneyEvent();
+//                        currentJourneyEvent.setCurrentLatLng(newPos);
+//                        JourneyEventBus.getInstance().setOnJourneyUpdate(currentJourneyEvent);
+                        marker.setPosition(newPos);
+                        marker.setAnchor(0.5f, 0.5f);
+                        marker.setRotation(getBearing(startPosition, newPos));
+                        mMap.animateCamera(CameraUpdateFactory.newCameraPosition
+                                (new CameraPosition.Builder().target(newPos)
+                                        .zoom(15.5f).build()));
+                    }
+                });
+                valueAnimator.start();
+                if (index != polyLineList.size() - 1) {
+                    handler.postDelayed(this, 3000);
+                }
+            }
+        }, 3000);
+    }
+
+
+    private float getBearing(LatLng startPosition, LatLng newPos){
+
+        double lat  = Math.abs(startPosition.latitude - newPos.latitude);
+        double lng  = Math.abs(startPosition.longitude - newPos.longitude);
+
+        if (startPosition.latitude < newPos.latitude && startPosition.longitude < newPos.longitude)
+            return (float) (Math.toDegrees(Math.atan(lng/lat)));
+
+       else if (startPosition.latitude >= newPos.latitude && startPosition.longitude < newPos.longitude)
+            return (float)((90 - Math.toDegrees(Math.atan(lng/lat)))+ 90);
+
+
+       else if (startPosition.latitude >=  newPos.latitude && startPosition.longitude >= newPos.longitude)
+            return (float) Math.toDegrees(Math.atan(lng/lat) + 180);
+
+
+        else if (startPosition.latitude < newPos.latitude && startPosition.longitude >= newPos.longitude)
+            return (float)((90 - Math.toDegrees(Math.atan(lng/lat)))+ 270);
+
+    return -1;
+    }
 }

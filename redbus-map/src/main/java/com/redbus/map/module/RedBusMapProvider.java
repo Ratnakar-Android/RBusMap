@@ -185,8 +185,8 @@ public class RedBusMapProvider<onRequestPermissionsResult> implements MapProvide
 
 
     private void drawRoutingLineOnMap(List<LatLng> PolylinePoints) {
-        Polyline polyline = mGoogleMap.addPolyline(RBCustomPolyline.getInstance().getDotPolyline(mContext).addAll(PolylinePoints));
-        polyline.setWidth(mContext.getResources().getDimension(R.dimen.selected_polyline_width));
+//        Polyline polyline = mGoogleMap.addPolyline(RBCustomPolyline.getInstance().getDotPolyline(mContext).addAll(PolylinePoints));
+//        polyline.setWidth(mContext.getResources().getDimension(R.dimen.selected_polyline_width));
     }
 
 
